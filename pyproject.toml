@@ -18,6 +18,7 @@ dependencies = [
     "pytest",
     "pyarrow",
     "requests",
+    "httpx",
 ]
 
 [tool.setuptools.packages.find]
