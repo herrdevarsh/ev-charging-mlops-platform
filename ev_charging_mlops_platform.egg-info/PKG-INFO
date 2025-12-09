@@ -13,3 +13,128 @@ Requires-Dist: joblib
 Requires-Dist: pytest
 Requires-Dist: pyarrow
 Requires-Dist: requests
+
+# EV Charging MLOps Platform
+
+End-to-end project that:
+- pulls real EV charging station data from the **Open Charge Map** API (Germany),
+- stores it locally as Parquet,
+- trains a regression model to predict `sessions_per_day`,
+- serves predictions via a FastAPI API.
+
+---
+
+## Data Source
+
+- **Open Charge Map API** – public EV charging locations  
+- Country: `DE` (Germany)  
+- Raw response is cached in: `data/raw/openchargemap_de.json`
+
+You must set an API key (free) from openchargemap.org in an env var:
+
+```bash
+OPENCHARGEMAP_API_KEY=your_key_here
+(On Windows PowerShell, set it once:)
+
+powershell
+Copy code
+[System.Environment]::SetEnvironmentVariable(
+  "OPENCHARGEMAP_API_KEY",
+  "your_key_here",
+  "User"
+)
+Pipeline Overview
+## Architecture
+
+```text
+          +----------------------+
+          |  Open Charge Map API |
+          +----------+-----------+
+                     |
+                     | HTTP (JSON)
+                     v
+          +------------------------------+
+          |  Ingest                      |
+          |  ev_charging_mlops_platform  |
+          |      .data_ingest           |
+          +------------------------------+
+             |                    |
+             | cache raw JSON     | flatten & label
+             v                    v
+  data/raw/openchargemap_de.json   data/processed/stations.parquet
+                                           |
+                                           | features + target
+                                           v
+                                +-----------------------------+
+                                |  Training                   |
+                                |  ev_charging_mlops_platform|
+                                |      .train_model          |
+                                +-----------------------------+
+                                           |
+                                           | save model + metadata
+                                           v
+                                models/model.joblib
+                                models/metadata.json
+                                           |
+                                           | load on startup
+                                           v
+                                +-----------------------------+
+                                |  FastAPI Service (api.main) |
+                                |  - GET /health              |
+                                |  - POST /predict            |
+                                +-----------------------------+
+                                           |
+                                           | HTTP (JSON)
+                                           v
+                                      Clients
+                           (curl, browser, frontend, etc.)
+
+
+Ingest
+
+Calls Open Charge Map API
+Caches raw JSON
+Flattens to a table and writes data/processed/stations.parquet
+
+Train
+Builds features from stations.parquet
+Trains a RandomForestRegressor on sessions_per_day
+Saves model + metadata in models/
+
+Serve
+FastAPI app loads the trained model
+POST /predict returns predicted_sessions_per_day for a given station profile
+
+How to Run Locally
+1. Setup
+bash
+Copy code
+git clone https://github.com/herrdevarsh/ev-charging-mlops-platform.git
+cd ev-charging-mlops-platform
+
+python -m venv .venv
+# PowerShell
+.\.venv\Scripts\Activate.ps1
+
+pip install -e .
+Make sure OPENCHARGEMAP_API_KEY is set (see above).
+
+2. Ingest Data
+bash
+Copy code
+python -m ev_charging_mlops_platform.data_ingest --refresh
+3. Train Model
+bash
+Copy code
+python -m ev_charging_mlops_platform.train_model
+4. Run Tests
+bash
+Copy code
+pytest
+5. Start API
+bash
+Copy code
+uvicorn api.main:app --reload
+Health check: GET http://127.0.0.1:8000/health
+
+Docs (Swagger UI): http://127.0.0.1:8000/docs

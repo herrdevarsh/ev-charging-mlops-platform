@@ -1,0 +1,21 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+RUN pip install --upgrade pip
+
+# copy project files
+COPY pyproject.toml README.md ./
+COPY ev_charging_mlops_platform ./ev_charging_mlops_platform
+COPY api ./api
+COPY models ./models
+
+# install package
+RUN pip install .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

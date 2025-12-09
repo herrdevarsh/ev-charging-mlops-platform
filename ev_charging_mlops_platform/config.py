@@ -6,7 +6,8 @@ DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 MODEL_DIR = PROJECT_ROOT / "models"
+LOG_DIR = DATA_DIR / "logs"
 
 # Make sure folders exist
-for p in (RAW_DIR, PROCESSED_DIR, MODEL_DIR):
+for p in (RAW_DIR, PROCESSED_DIR, MODEL_DIR, LOG_DIR):
     p.mkdir(parents=True, exist_ok=True)

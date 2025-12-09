@@ -11,3 +11,9 @@ class StationFeatures(BaseModel):
 
 class PredictionResponse(BaseModel):
     predicted_sessions_per_day: float
+
+
+class ModelMetadata(BaseModel):
+    model_type: str | None = None
+    mae: float | None = None
+    training_timestamp: str | None = None

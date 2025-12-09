@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 
 import joblib
 from sklearn.ensemble import RandomForestRegressor
@@ -32,6 +33,7 @@ def train():
         "n_estimators": 200,
         "mae": float(mae),
         "feature_columns": list(X_train.columns),
+        "training_timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
     meta_path = MODEL_DIR / "metadata.json"
