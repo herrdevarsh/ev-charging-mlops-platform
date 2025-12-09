@@ -1,26 +1,31 @@
 from fastapi.testclient import TestClient
+import pytest
 
 from ev_charging_mlops_platform.data_ingest import run_ingest
 from ev_charging_mlops_platform.train_model import train
 from api.main import app
 
 
-def setup_module():
-    # Prepare data + model for API tests
+@pytest.fixture(scope="session")
+def client():
+    # Prepare data + model once for all API tests
     run_ingest()
     train()
 
+    # Create TestClient AFTER model exists so startup can load it
+    with TestClient(app) as c:
+        yield c
 
-client = TestClient(app)
 
-
-def test_health():
+def test_health(client):
     resp = client.get("/health")
     assert resp.status_code == 200
-    assert resp.json()["status"] == "ok"
+    data = resp.json()
+    assert data["status"] == "ok"
+    assert data["model_loaded"] is True
 
 
-def test_predict():
+def test_predict(client):
     payload = {
         "region": "Berlin",
         "city_type": "urban",
