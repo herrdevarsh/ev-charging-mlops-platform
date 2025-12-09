@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ev-charging-mlops-platform"
+version = "0.1.0"
+description = "EV charging MLOps platform (training + prediction API)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "joblib",
+    "pytest",
+    "pyarrow",
+    "requests",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ev_charging_mlops_platform", "api"]
