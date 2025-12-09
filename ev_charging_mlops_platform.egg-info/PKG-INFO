@@ -13,6 +13,8 @@ Requires-Dist: joblib
 Requires-Dist: pytest
 Requires-Dist: pyarrow
 Requires-Dist: requests
+Requires-Dist: httpx
+Requires-Dist: streamlit
 
 # EV Charging MLOps Platform
 

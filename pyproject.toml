@@ -19,6 +19,7 @@ dependencies = [
     "pyarrow",
     "requests",
     "httpx",
+    "streamlit",
 ]
 
 [tool.setuptools.packages.find]
