@@ -7,6 +7,7 @@ import pandas as pd
 import requests
 
 from .config import RAW_DIR, PROCESSED_DIR
+from .settings import settings
 
 BASE_URL = "https://api.openchargemap.io/v3/poi/"
 RAW_JSON_FILE = RAW_DIR / "openchargemap_de.json"
@@ -14,8 +15,8 @@ PROCESSED_FILE = PROCESSED_DIR / "stations.parquet"
 
 
 def fetch_openchargemap(
-    countrycode: str = "DE",
-    maxresults: int = 2000,
+    countrycode: str,
+    maxresults: int,
     opendata: bool = True,
 ) -> List[Dict[str, Any]]:
     """
@@ -146,7 +147,11 @@ def run_ingest(force_refresh: bool = False) -> None:
             pois = json.load(f)
     else:
         print("Calling Open Charge Map API for fresh data...")
-        pois = fetch_openchargemap()
+        pois = fetch_openchargemap(
+            countrycode=settings.ingest.countrycode,
+            maxresults=settings.ingest.maxresults,
+            opendata=settings.ingest.opendata,
+        )
         with RAW_JSON_FILE.open("w", encoding="utf-8") as f:
             json.dump(pois, f, indent=2)
         print(f"Cached raw JSON to {RAW_JSON_FILE}")

@@ -9,6 +9,7 @@ ev_charging_mlops_platform/data_ingest.py
 ev_charging_mlops_platform/feature_engineering.py
 ev_charging_mlops_platform/predict.py
 ev_charging_mlops_platform/prediction_log.py
+ev_charging_mlops_platform/settings.py
 ev_charging_mlops_platform/train_model.py
 ev_charging_mlops_platform.egg-info/PKG-INFO
 ev_charging_mlops_platform.egg-info/SOURCES.txt
